@@ -1,0 +1,20 @@
+{% load static %}
+<script>
+  window.NESTRO_CONFIG = {
+    staticUrl: "{% static '' %}",
+    csrfToken: "{{ csrf_token }}",
+    {% if user.is_authenticated %}role: "customer",{% endif %}
+    links: {
+      home: "{% url 'home' %}",
+      shop: "{% url 'shop' %}",
+      consultation: "{% url 'consultation' %}",
+      about: "{% url 'about' %}",
+      contact: "{% url 'contact' %}",
+      login: "{% url 'login' %}",
+      register: "{% url 'register' %}",
+      forgotPassword: "{% url 'forgot_password' %}",
+      logout: "{% url 'logout' %}"
+    },
+    api: {}
+  };
+</script>
