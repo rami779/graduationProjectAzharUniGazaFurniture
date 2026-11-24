@@ -1,0 +1,478 @@
+.auth {
+  display: grid;
+  grid-template-columns: 1fr calc(654 / 1440 * 100vw); 
+}
+
+.auth__main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.auth__stage {
+  width: 786px;           
+  flex: 0 0 auto;
+}
+
+.auth__visual {
+  position: relative;
+  min-height: 100vh;
+}
+
+.auth__visual img {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+}
+
+/*  home icon + logo */
+.auth__home {
+  position: absolute;
+  left: 42px;
+  top: 54px;
+  width: 46px;
+  height: 46px;
+}
+
+.auth__logo {
+  position: absolute;
+  left: 224px;
+  top: 58px;
+  display: flex;
+  align-items: flex-start;
+  gap: 21px;              
+  color: var(--color-brown);
+}
+
+.auth__logo img {
+  margin-top: 6px;       
+}
+
+/* Card  */
+.auth-card {
+  position: absolute;
+  left: 120px;
+  top: 134px;
+  width: 467px;
+  padding: 13px 24px 0 22px;
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Log in / Create Account- */
+.auth-tabs {
+  display: flex;
+  gap: 13px;
+}
+
+.auth-tabs__tab {
+  display: flex;
+  align-items: center;
+  width: 204px;
+  height: 51px;
+  border-radius: var(--radius-tab);
+  background: var(--color-white);
+  color: var(--color-brown);
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 25.5px;
+}
+
+
+.auth-tabs__tab:first-child {
+  padding-left: 69px;        /* text x 211 − tab x 142 */
+}
+
+.auth-tabs__tab:last-child {
+  padding-left: 34px;        /* text x 393 − tab x 359 */
+}
+
+.auth-tabs__tab--active {
+  background: var(--color-cream);
+}
+
+/*  Fields */
+.field {
+  width: 352px;
+}
+
+.field--password {
+  width: 354px;
+}
+
+.field + .field {
+  margin-top: 22px;
+}
+
+.field__label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-brown);
+  font-family: var(--font-inter);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;         /* 140% */
+}
+
+.field__label--indent {
+  padding-left: 0.28em;     
+}
+
+.field__control {
+  position: relative;
+}
+
+.field__input {
+  display: block;
+  width: 100%;
+  height: 40px;
+  margin: 0;
+  padding: 0 13px;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-input);
+  background: var(--color-white);
+  color: var(--color-black);
+  font-family: var(--font-inter);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 16px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field__input::placeholder {
+  color: var(--color-placeholder);
+  opacity: 1;
+}
+
+.field__input:focus-visible {
+  border-color: var(--color-brown);
+}
+
+.field--password .field__input {
+  padding-right: 39px;       /* room for the eye icon */
+}
+
+
+.field__input::-ms-reveal {
+  display: none;
+}
+
+/* Error state */
+.field--invalid .field__input {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 1px var(--color-error);
+}
+
+/* hide password */
+.field__toggle {
+  position: absolute;
+  right: 13px;
+  top: 11px;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+}
+
+.field__toggle-slash {
+  display: none;
+}
+
+.field__toggle[aria-pressed="true"] .field__toggle-slash {
+  display: inline;
+}
+
+/* Error message  */
+.field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 0;
+  color: var(--color-error);
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 16.5px;
+}
+
+.field__error[hidden] {
+  display: none;
+}
+
+.field__error img {
+  flex: 0 0 14px;
+  margin-top: 1px;
+}
+
+/* forgot link / hint + error */
+.field__meta {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* With a password error: error on the left, link / hint moves to the right */
+.field--invalid .field__meta {
+  justify-content: space-between;
+}
+
+.field--invalid .field__meta .field__error {
+  padding-left: 1px;
+}
+
+/*  Primary button */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 294.63px;
+  height: 53.1px;
+  border-radius: var(--radius-pill-btn);
+  background: var(--color-brown);
+  color: var(--color-white);
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 25.5px;
+  transition: background-color 0.15s ease;
+}
+
+/* Hover  */
+.btn-primary:hover,
+.btn-primary:focus-visible,
+.btn-primary[aria-busy="true"] {
+  background: var(--color-brown-hover);
+}
+
+.btn-primary[aria-busy="true"] {
+  cursor: progress;
+}
+
+/*  "Or sign up with */
+.auth-divider {
+  position: relative;
+  width: 354px;
+  height: 17px;
+}
+
+.auth-divider__line {
+  position: absolute;
+  top: 8px;
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.auth-divider__line--left {
+  left: 0;
+  width: 119px;
+}
+
+.auth-divider__line--right {
+  left: 232px;
+  width: 122px;
+}
+
+.auth-divider__text {
+  position: absolute;
+  left: 132px;
+  top: 0;
+  width: 84px;
+  color: var(--color-divider);
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 16.5px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/*  Google button */
+.btn-google {
+  display: flex;
+  align-items: center;
+  gap: 21.6px;
+  width: 296.9px;
+  height: 53px;
+  margin-left: 59px;        
+  padding-left: 39px;       
+  border: 1px solid var(--color-google-border);
+  border-radius: var(--radius-pill-btn);
+  background: transparent;
+  color: var(--color-google-text);
+  font-family: var(--font-inter);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  transition: background-color 0.15s ease;
+}
+
+.btn-google img {
+  flex: 0 0 31.1px;
+}
+
+/* Hover => Google button  */
+.btn-google:hover,
+.btn-google:focus-visible {
+  background: var(--color-google-hover);
+}
+
+/* I Don’t have an account" / "Already have an account ? */
+.auth-card__switch {
+  line-height: 0;
+}
+
+.auth-card__switch-link {
+  position: relative;
+  display: inline-block;
+  color: var(--color-brown-dark);
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 19.5px;
+}
+
+.auth-card__switch-link::after { 
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 18px;
+  width: var(--switch-underline, 160px);
+  height: 1px;
+  background: var(--color-brown-dark);
+}
+
+/* Responsive */
+@media (max-width: 1023px) {
+  .auth {
+    display: block;
+  }
+
+  .auth__visual {
+    display: none;
+  }
+
+  .auth__main {
+    display: block;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+  }
+
+  .auth__stage {
+    width: 100%;
+    max-width: 467px;
+    height: auto;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 46px 1fr 46px;
+    align-items: center;
+    row-gap: 24px;
+  }
+
+  .auth__home,
+  .auth__logo,
+  .auth-card {
+    position: static;
+  }
+
+  .auth__logo {
+    justify-self: center;
+  }
+
+  .auth-card {
+    grid-column: 1 / -1;
+    height: auto;
+    padding-bottom: 24px;
+  }
+}
+
+/* Phones */
+@media (max-width: 520px) {
+  .auth__logo {
+    gap: 12px;
+  }
+
+  .auth__logo .brand {
+    font-size: 26px;
+    line-height: 34px;
+  }
+
+  .auth__home img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .auth-card {
+    width: 100%;
+    padding: 13px 16px 28px;
+  }
+
+  .auth-tabs {
+    gap: 8px;
+  }
+
+  .auth-tabs__tab,
+  .auth-tabs__tab:first-child,
+  .auth-tabs__tab:last-child {
+    flex: 1 1 0;
+    width: auto;
+    justify-content: center;
+    padding-left: 0;
+    font-size: 16px;
+  }
+
+  .auth-form__fields {
+    height: auto;
+    margin-left: 0;
+  }
+
+  .field,
+  .field--password {
+    width: 100%;
+  }
+
+  .auth-form__submit,
+  .btn-google {
+    width: 100%;
+    max-width: 296.9px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-right: 0;
+  }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .auth-divider__line,
+  .auth-divider__text {
+    position: static;
+  }
+
+  .auth-divider__line--left,
+  .auth-divider__line--right {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  .auth-divider__text {
+    width: auto;
+  }
+
+  .btn-google {
+    justify-content: center;
+    padding-left: 0;
+  }
+
+  .auth-card__switch {
+    margin-left: 0;
+    text-align: center;
+  }
+}

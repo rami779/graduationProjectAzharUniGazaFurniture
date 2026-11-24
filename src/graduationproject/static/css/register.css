@@ -1,0 +1,175 @@
+/* "Username" field */
+.field--name .field__label {
+  margin-bottom: 6px;
+}
+
+/* Name / email errors */
+#field-name .field__error,
+#field-email .field__error {
+  margin: 6px 0 -5px; 
+  color: #EC221F;
+  }
+
+
+
+/* Eye icon position */
+#field-password .field__toggle {
+  right: 15px;
+  top: 12px;
+}
+
+/* Password row: "At least 8 characters"  */
+.field__meta {
+  margin-top: 9px;           
+}
+
+.field__hint {
+  margin: 0 0 0 8px;        
+  color: #5f5f5f;
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+/* "Register empty password case" */
+.field--invalid .field__hint {
+  margin: 0 2px 0 12px;
+}
+
+/*  Terms checkbox */
+.terms {
+  margin-top: 27px;         
+  padding-left: 8px;        
+}
+
+.terms__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;                 
+  cursor: pointer;
+}
+
+.terms__box {
+  position: relative;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-brown);
+  background: transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.terms__box svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
+/* Checked: fill #4C391E with the white check */
+.terms__input:checked + .terms__box {
+  border-color: var(--color-brown-dark);
+  background: var(--color-brown-dark);
+}
+
+.terms__input:checked + .terms__box svg {
+  opacity: 1;
+}
+
+.terms__input:focus-visible + .terms__box {
+  outline: 2px solid var(--color-brown);
+  outline-offset: 2px;
+}
+
+.terms__text {
+  color: #555555;
+  font-family: var(--font-inter);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 11px;
+}
+
+/* "Register empty polices check"*/
+.terms__error {
+  margin: 13px 0 0 -3px;     
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 15px;
+}
+
+.auth-form {
+  margin-top: 26px;          
+}
+
+.auth-card__switch {
+  --switch-underline: 179px;
+}
+
+/* Desktop frame height */
+@media (min-width: 1024px) {
+  .auth__stage {
+    height: 888px;
+  }
+}
+
+
+@media (min-width: 521px) {
+  .auth-card {
+    min-height: 714px;
+  }
+
+  .auth-form__fields {
+    min-height: 360px;       
+    margin-left: 30px;       
+  }
+
+  .auth-form__submit {
+    margin-left: 58px;       
+    padding-right: 4.2px;  
+  }
+
+  .auth-divider {
+    margin: 27.9px 0 0 35px; 
+  }
+
+  .btn-google {
+    margin-top: 33px;        
+  }
+
+  .auth-card__switch {
+    margin: 28px 0 22px 121px; 
+  }
+}
+
+@media (max-width: 520px) {
+  .auth-form__fields {
+    min-height: 360px;
+  }
+
+  .terms {
+    padding-left: 0;
+  }
+
+  .terms__label {
+    align-items: flex-start;
+  }
+
+  .terms__text {
+    line-height: 16px;
+    padding-top: 2px;
+  }
+
+  .auth-divider {
+    margin-top: 27.9px;
+  }
+
+  .btn-google {
+    margin-top: 33px;
+  }
+
+  .auth-card__switch {
+    margin-top: 28px;
+  }
+}
