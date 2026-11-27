@@ -49,8 +49,9 @@ class Address(models.Model):
     street_address = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=20)
     is_default = models.BooleanField(default=False)
-
-
+    def __str__(self):
+        return self.country + self.province
+    
 class Category(models.Model):
     name = models.CharField(max_length=100)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, related_name='children')
@@ -59,19 +60,25 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = 'categories'
 
+    def __str__(self):
+        return self.name
 
 class Color(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color_hexa = models.CharField(max_length=7)  # e.g. "#1A1A1A"
 
-
+    def __str__(self):
+        return self.name
+    
 class Material(models.Model):
     name = models.CharField(max_length=100, unique=True)
-
-
+    def __str__(self):
+        return self.name
+    
 class Shape(models.Model):
     name = models.CharField(max_length=100, unique=True)
-
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):
     class Status(models.TextChoices):
@@ -103,7 +110,8 @@ class Product(models.Model):
     is_discontinued = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    def __str__(self):
+        return self.name
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
@@ -114,8 +122,9 @@ class ProductVariant(models.Model):
     color = models.ForeignKey(Color, null=True, blank=True, on_delete=models.SET_NULL)
     material = models.ForeignKey(Material, null=True, blank=True, on_delete=models.SET_NULL)
     is_active = models.BooleanField(default=True)
-
-
+    def __str__(self):
+        return f"{self.product.name} ({self.sku})"
+    
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='products/')
@@ -123,7 +132,8 @@ class ProductImage(models.Model):
 
     class Meta:
         ordering = ['sort_order']
-
+    def __str__(self):
+        return f"Image of {self.product.name}"
 # ------------------
 
 class Cart(models.Model):
@@ -132,6 +142,8 @@ class Cart(models.Model):
     session_key = models.CharField(max_length=40, null=True, blank=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f"Cart {self.pk} ({self.user or 'guest'})"
 
 
 class CartItem(models.Model):
@@ -147,12 +159,14 @@ class CartItem(models.Model):
             models.UniqueConstraint(fields=['cart', 'product'], condition=Q(variant__isnull=True), name='unique_cart_item_no_variant'),
         ]
 
-
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
 
 class ShippingZone(models.Model):
     name = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
-
+    def __str__(self):
+        return self.name
 
 class ShippingZoneDestination(models.Model):
     zone = models.ForeignKey(ShippingZone, on_delete=models.CASCADE, related_name='destinations')
@@ -163,7 +177,8 @@ class ShippingZoneDestination(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['country', 'province'], name='one_zone_per_destination'),
         ]
-
+    def __str__(self):
+        return f"{self.zone.name}: {self.country} {self.province}".strip()
 
 class WeightBracket(models.Model):
     zone = models.ForeignKey(ShippingZone, on_delete=models.CASCADE, related_name='brackets')
@@ -186,6 +201,8 @@ class WeightBracket(models.Model):
         ).exclude(pk=self.pk)
         if overlapping.exists():
             raise ValidationError('This weight range overlaps an existing bracket in the zone.')
+    def __str__(self):
+        return f"{self.zone.name}: {self.min_weight}-{self.max_weight} kg"
 
 # ----------
 class OrderHeader(models.Model):
@@ -195,7 +212,9 @@ class OrderHeader(models.Model):
         SHIPPING = 'shipping', 'Shipping'
         DELIVERED = 'delivered', 'Delivered'
         COMPLETED = 'completed', 'Completed'
-
+    def __str__(self):
+        return f"Order {self.order_number}"
+    
     class PaymentStatus(models.TextChoices):
         PENDING = 'pending', 'Pending'
         PAID = 'paid', 'Paid'
@@ -224,7 +243,9 @@ class OrderHeader(models.Model):
     ship_postal_code = models.CharField(max_length=20)
     tracking_number = models.CharField(max_length=100, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
-
+    def __str__(self):
+        return self.order_number + self.user
+    
 class StockReservation(models.Model):
     class Status(models.TextChoices):
         ACTIVE = 'active', 'Active'
@@ -240,7 +261,9 @@ class StockReservation(models.Model):
     expires_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     order_header = models.ForeignKey(OrderHeader, null=True, blank=True, on_delete=models.SET_NULL, related_name='stock_reservations')
-
+    def __str__(self):
+        return f"Reservation {self.pk}: {self.quantity} x {self.product.name}"
+    
 class OrderDetail(models.Model):
     order_header = models.ForeignKey(OrderHeader, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
@@ -250,7 +273,8 @@ class OrderDetail(models.Model):
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     line_total = models.DecimalField(max_digits=10, decimal_places=2)
-
+    def __str__(self):
+        return self.product_name
 
 class OrderStatusHistory(models.Model):
     order_header = models.ForeignKey(OrderHeader, on_delete=models.CASCADE, related_name='status_history')
@@ -259,7 +283,8 @@ class OrderStatusHistory(models.Model):
     changed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
                                    on_delete=models.SET_NULL, related_name='+')
     changed_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return self.new_status
 
 class OrderIssue(models.Model):
     class IssueType(models.TextChoices):
@@ -280,7 +305,8 @@ class OrderIssue(models.Model):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.OPEN)
     created_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
-
+    def __str__(self):
+        return self.issue_type
 
 class Payment(models.Model):
     class PaymentType(models.TextChoices):
@@ -315,14 +341,17 @@ class Payment(models.Model):
                 condition=(Q(payment_type='order', order_header__isnull=False, consultation__isnull=True) |
                            Q(payment_type='consultation', consultation__isnull=False, order_header__isnull=True)), name='payment_has_exactly_one_target'),
         ]
-
+    def __str__(self):
+        return f"Payment {self.pk} ({self.status})"
+    
 class PaymentEvent(models.Model):
     payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name='events')
     provider_event_id = models.CharField(max_length=255, unique=True)  # blocks duplicate callbacks
     event_type = models.CharField(max_length=100)
     payload = models.JSONField()
     received_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return self.event_type
 
 class Refund(models.Model):
     class Status(models.TextChoices):
@@ -344,7 +373,8 @@ class Refund(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     dispute = models.ForeignKey('Dispute', null=True, blank=True, on_delete=models.SET_NULL, related_name='refunds')
-
+    def __str__(self):
+        return f"Refund {self.pk} ({self.status})"
 #--------------------------
 
 class Review(models.Model):
@@ -365,7 +395,8 @@ class Review(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['product', 'user'], name='one_review_per_user_per_product'),
         ]
-
+    def __str__(self):
+        return f"{self.rating}/5 on {self.product.name}"
 
 class SupportTicket(models.Model):
     class Status(models.TextChoices):
@@ -382,7 +413,8 @@ class SupportTicket(models.Model):
                                     on_delete=models.SET_NULL, related_name='assigned_tickets')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    def __str__(self):
+        return self.subject
 
 class AccountDeletionRequest(models.Model):
     class Status(models.TextChoices):
@@ -401,6 +433,8 @@ class AccountDeletionRequest(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user'], condition=Q(status='pending'), name='one_pending_deletion_request_per_user'),
         ]
+    def __str__(self):
+        return f"Deletion request by {self.user} ({self.status})"
 
 
 class Notification(models.Model):
@@ -419,7 +453,8 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-
+    def __str__(self):
+        return self.message
 
 class AuditLog(models.Model):
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name='audit_entries')
@@ -441,23 +476,27 @@ class AuditLog(models.Model):
 
     def delete(self, *args, **kwargs):
         raise PermissionError('Audit log entries cannot be deleted.')
-
+    def __str__(self):
+        return f"{self.action} on {self.target_type} {self.target_id}"
 
 class SystemSetting(models.Model):
     setting_key = models.CharField(max_length=100, unique=True)
     setting_value = models.CharField(max_length=255)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     updated_at = models.DateTimeField(auto_now=True)
-
+    def __str__(self):
+        return self.setting_key
 #-----------------
 
 class Specialization(models.Model):
     name = models.CharField(max_length=100, unique=True)
-
+    def __str__(self):
+        return self.name
 
 class DesignStyle(models.Model):
     name = models.CharField(max_length=100, unique=True)
-
+    def __str__(self):
+        return self.name
 
 class DesignerApplication(models.Model):
     class Status(models.TextChoices):
@@ -482,7 +521,8 @@ class DesignerApplication(models.Model):
     def clean(self):
         if self.status == self.Status.REJECTED and not self.rejection_reason.strip():
             raise ValidationError('A rejection reason is required.')
-
+    def __str__(self):
+        return f"Application by {self.user} ({self.status})"
 
 class ApplicationDocument(models.Model):
     class DocumentType(models.TextChoices):
@@ -494,7 +534,8 @@ class ApplicationDocument(models.Model):
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
     file = models.FileField(upload_to='private/applications/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return f"{self.document_type} for application {self.application_id}"
 
 class DesignerAvailability(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='availability_slots')
@@ -506,6 +547,8 @@ class DesignerAvailability(models.Model):
         constraints = [
             models.CheckConstraint(condition=Q(start_time__lt=F('end_time')), name='availability_start_before_end'),
         ]
+    def __str__(self):
+        return f"{self.user} day {self.day_of_week} {self.start_time}-{self.end_time}"
 
 
 class PortfolioItem(models.Model):
@@ -520,7 +563,8 @@ class PortfolioItem(models.Model):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    def __str__(self):
+        return self.title
 
 class PortfolioMedia(models.Model):
     class FileType(models.TextChoices):
@@ -534,7 +578,8 @@ class PortfolioMedia(models.Model):
 
     class Meta:
         ordering = ['sort_order']
-
+    def __str__(self):
+        return f"Media {self.pk} of {self.portfolio_item.title}"
 
 class DesignerStatusHistory(models.Model):
     class Action(models.TextChoices):
@@ -551,7 +596,9 @@ class DesignerStatusHistory(models.Model):
     def clean(self):
         if self.action == self.Action.SUSPENDED and not self.reason.strip():
             raise ValidationError('A reason is required to suspend a designer.')
-
+    def __str__(self):
+        return f"{self.user}: {self.action}"
+    
 #---------------
 
 class Question(models.Model):
@@ -571,7 +618,9 @@ class Question(models.Model):
     class Meta:
         ordering = ['sort_order']
 
-
+    def __str__(self):
+        return self.text
+    
 class AnswerOption(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
     text = models.CharField(max_length=255)
@@ -579,7 +628,8 @@ class AnswerOption(models.Model):
 
     class Meta:
         ordering = ['sort_order']
-
+    def __str__(self):
+        return self.text
 
 class Consultation(models.Model):
     class Status(models.TextChoices):
@@ -608,7 +658,8 @@ class Consultation(models.Model):
         constraints = [
             models.CheckConstraint(condition=~Q(customer=F('designer')), name='consultation_customer_not_designer'),
         ]
-
+    def __str__(self):
+        return f"Consultation {self.pk}: {self.customer} with {self.designer}"
 
 class ConsultationAnswer(models.Model):
     consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE, related_name='answers')
@@ -616,7 +667,8 @@ class ConsultationAnswer(models.Model):
     answer_option = models.ForeignKey(AnswerOption, null=True, blank=True, on_delete=models.PROTECT)
     answer_text = models.TextField(blank=True)
     question_text_snapshot = models.CharField(max_length=255)   # keeps old consultations readable
-
+    def __str__(self):
+        return self.question_text_snapshot
 
 class ConsultationStatusHistory(models.Model):
     consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE, related_name='status_history')
@@ -624,7 +676,8 @@ class ConsultationStatusHistory(models.Model):
     new_status = models.CharField(max_length=20)
     changed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     changed_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return f"{self.old_status} -> {self.new_status}"
 
 class ConsultationTerms(models.Model):
     class Status(models.TextChoices):
@@ -648,7 +701,8 @@ class ConsultationTerms(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['consultation', 'version_number'], name='unique_terms_version_per_consultation'),
         ]
-
+    def __str__(self):
+        return f"Terms v{self.version_number} for consultation {self.consultation_id}"
 
 class TermsAcceptance(models.Model):
     terms = models.ForeignKey(ConsultationTerms, on_delete=models.CASCADE, related_name='acceptances')
@@ -659,7 +713,8 @@ class TermsAcceptance(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['terms', 'user'], name='one_acceptance_per_user_per_version'),
         ]
-
+    def __str__(self):
+        return f"{self.user} accepted terms {self.terms_id}"
 
 class ConsultationMessage(models.Model):
     consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE, related_name='messages')
@@ -669,7 +724,8 @@ class ConsultationMessage(models.Model):
 
     class Meta:
         ordering = ['created_at']
-
+    def __str__(self):
+        return f"Message {self.pk} in consultation {self.consultation_id}"
 
 class ConsultationFile(models.Model):
     consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE, related_name='files')
@@ -679,7 +735,8 @@ class ConsultationFile(models.Model):
     file_type = models.CharField(max_length=100)
     file_size = models.PositiveBigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return self.file_name
 
 class CancellationRequest(models.Model):
     class Status(models.TextChoices):
@@ -694,7 +751,8 @@ class CancellationRequest(models.Model):
     decided_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     requested_at = models.DateTimeField(auto_now_add=True)
     decided_at = models.DateTimeField(null=True, blank=True)
-
+    def __str__(self):
+        return f"Cancellation request for consultation {self.consultation_id} ({self.status})"
 
 class Dispute(models.Model):
     class DisputeType(models.TextChoices):
@@ -720,7 +778,8 @@ class Dispute(models.Model):
     def clean(self):
         if self.decision and not self.decision_rationale.strip():
             raise ValidationError('A decision needs a written rationale.')
-
+    def __str__(self):
+            return f"Dispute {self.pk} ({self.status})"
 #---------------------------
 
 class Report(models.Model):
@@ -737,7 +796,8 @@ class Report(models.Model):
     details = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.OPEN)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return f"Report {self.pk} ({self.status})"
 
 class ContactSharingFlag(models.Model):
     class Status(models.TextChoices):
@@ -751,7 +811,8 @@ class ContactSharingFlag(models.Model):
     reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     reviewed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return f"Flag {self.pk}: {self.rule_matched}"
 
 class ModerationAction(models.Model):
     class ActionType(models.TextChoices):
@@ -768,7 +829,8 @@ class ModerationAction(models.Model):
     justification = models.TextField()
     expires_at = models.DateTimeField(null=True, blank=True)   # restrictions and suspensions are temporary
     created_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return f"{self.action_type} for {self.target_user}"
 
 class AdminNote(models.Model):
     target_type = models.CharField(max_length=50)   # e.g. 'Dispute', 'DesignerApplication'
@@ -776,8 +838,9 @@ class AdminNote(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='+')
     note = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-
-
+    def __str__(self):
+        return f"Note on {self.target_type} {self.target_id}"
+    
 class DesignerEarning(models.Model):
     class Status(models.TextChoices):
         PENDING = 'pending', 'Pending'
@@ -799,7 +862,8 @@ class DesignerEarning(models.Model):
         constraints = [
             models.CheckConstraint(condition=Q(gross_amount=F('commission_amount') + F('net_amount')), name='earning_gross_equals_commission_plus_net'),
         ]
-
+    def __str__(self):
+        return f"Earning {self.pk}: {self.net_amount} {self.currency}"
 
 class EarningAdjustment(models.Model):
     earning = models.ForeignKey(DesignerEarning, on_delete=models.PROTECT, related_name='adjustments')
@@ -807,7 +871,8 @@ class EarningAdjustment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)   # negative for deductions
     reason = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return f"Adjustment {self.pk}: {self.amount}"
 
 class PayoutMethod(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='payout_methods')
@@ -815,7 +880,8 @@ class PayoutMethod(models.Model):
     details_encrypted = models.TextField()
     is_default = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
-
+    def __str__(self):
+        return f"{self.method_type} for {self.user}"
 
 class Payout(models.Model):
     class Status(models.TextChoices):
@@ -834,7 +900,11 @@ class Payout(models.Model):
     requested_at = models.DateTimeField(auto_now_add=True)
     paid_at = models.DateTimeField(null=True, blank=True)
 
-
+    def __str__(self):
+        return f"Payout {self.pk}: {self.amount} {self.currency} ({self.status})"
+    
 class PayoutItem(models.Model):
     payout = models.ForeignKey(Payout, on_delete=models.CASCADE, related_name='items')
     earning = models.OneToOneField(DesignerEarning, on_delete=models.PROTECT, related_name='payout_item')
+    def __str__(self):
+        return f"Payout {self.payout_id} item {self.earning_id}"
